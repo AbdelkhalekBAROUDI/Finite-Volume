@@ -46,7 +46,6 @@ def orthocenter(T):
     """
     
     angle = angles(T)
-    C = tan(angle[0]) +  tan(angle[1]) + tan(angle[2]) 
     
     # Extract coordinates of the vertices
     A = T[0]
