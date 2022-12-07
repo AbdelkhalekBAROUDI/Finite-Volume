@@ -1,6 +1,8 @@
 from manapy.ddm import readmesh
 from manapy.ddm import Domain
 
+import mumps
+
 import numpy as np
 
 import os
