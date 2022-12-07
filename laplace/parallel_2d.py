@@ -1,4 +1,3 @@
-#%%file poisson_2d.py
 from manapy.ddm import readmesh
 from manapy.ddm import Domain
 
@@ -26,7 +25,7 @@ except:
     BASE_DIR = os.path.join(BASE_DIR , '..')
     MESH_DIR = os.path.join(BASE_DIR, 'mesh')
 '''
-filename = "../mesh/untitled.msh"
+filename = "../mesh/rectangle.msh"
 #filename = os.path.join(MESH_DIR, filename)
 
         
@@ -43,7 +42,7 @@ nodes   = domain.nodes
 halos   = domain.halos
 
 
-def Assembly_M3(cellid:'int[:,:]', centerf:'float[:]', haloext:'int[:,:]',halofid:'int[:]',
+def Assembly(cellid:'int[:,:]', centerf:'float[:]', haloext:'int[:,:]',halofid:'int[:]',
                 loctoglob:'int[:]', mesuref:'float[:]', namef:'int[:]', innerfaces:'int[:]', 
                 boundaryfaces:'int[:]', halofaces:'int[:]', globalsize):
     
@@ -161,11 +160,11 @@ def Assembly_M3(cellid:'int[:,:]', centerf:'float[:]', haloext:'int[:,:]',halofi
  
 globalsize = COMM.allreduce(nbcells, op=MPI.SUM)
   
-row, col, data, b3 = Assembly_M3(faces.cellid, faces.center, halos.halosext, faces.halofid, cells.loctoglob,
+row, col, data, b = Assembly(faces.cellid, faces.center, halos.halosext, faces.halofid, cells.loctoglob,
                                  faces.mesure, faces.name, domain.innerfaces, domain.boundaryfaces, 
                                  domain.halofaces, globalsize)
 
-rhs0_glob = COMM.reduce(b3, op=MPI.SUM, root=0)
+rhs0_glob = COMM.reduce(b, op=MPI.SUM, root=0)
 
 #if RANK == 0:
 #    print(rhs0_glob)
@@ -190,8 +189,8 @@ ctx.run(job=2)
 #u3 = np.zeros(nbcells)
 #Allocation size of rhs
 if RANK == 0:
-    u3 = rhs0_glob.copy()
-    ctx.set_rhs(u3)
+    u = rhs0_glob.copy()
+    ctx.set_rhs(u)
             
 #Solution Phase
 ctx.run(job=3)
@@ -205,11 +204,11 @@ ctx.destroy()
 
 sendcounts1 = np.array(COMM.gather(nbcells, root=0))
 x1converted = np.zeros(globalsize)
-u3_loc = np.zeros(nbcells)
+u_loc = np.zeros(nbcells)
 
 if RANK == 0:
     #Convert solution for scattering
-    convert_solution(u3, x1converted, domain.cells.tc, globalsize)
-COMM.Scatterv([x1converted, sendcounts1, MPI.DOUBLE], u3_loc, root = 0)
+    convert_solution(u, x1converted, domain.cells.tc, globalsize)
+COMM.Scatterv([x1converted, sendcounts1, MPI.DOUBLE], u_loc, root = 0)
 
-domain.save_on_cell(miter=2, value = u3_loc )
+domain.save_on_cell(miter=2, value = u_loc )
