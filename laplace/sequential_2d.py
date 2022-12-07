@@ -41,6 +41,7 @@ def Assembly(cellid:'int[:,:]', centerf:'float[:]',
     
     sizeM  = 4*len(innerfaces)+len(boundaryfaces)
     center = np.zeros( (nbcells, 2), dtype = np.float64 )
+    b      = np.zeros( nbcells, dtype = np.float64 )  
     row    = np.zeros(    sizeM, dtype = np.int32   )
     col    = np.zeros(    sizeM, dtype = np.int32   )
     data   = np.zeros(    sizeM, dtype = np.float64   )
@@ -91,7 +92,7 @@ def Assembly(cellid:'int[:,:]', centerf:'float[:]',
     return mat, row, col, data, b
 
  
-M, row, col, data, b3 = Assembly(faces.cellid, faces.center, faces.mesure, 
+M, row, col, data, b = Assembly(faces.cellid, faces.center, faces.mesure, 
                                     faces.name, domain.innerfaces, domain.boundaryfaces)
 
 u = spsolve(M, b)
