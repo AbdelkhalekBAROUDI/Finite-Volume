@@ -20,7 +20,7 @@ except:
     BASE_DIR = os.path.join(BASE_DIR , '..')
     MESH_DIR = os.path.join(BASE_DIR, 'mesh')
 '''
-filename = "carre.msh"
+filename = "../mesh/rectangle.msh"
 
         
 dim = 2
